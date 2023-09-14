@@ -1,12 +1,27 @@
 import { PrismaClient, Employee } from "@prisma/client";
-import { Api500Error } from "../../util/500-error";
+
+import { Api500Error } from "../util/500-error";
+
+import redis from "../util/cache";
 
 const prisma = new PrismaClient();
 
 export default class EmployeeRepository {
   async getById(id: string) {
     try {
-      return await prisma.employee.findFirst({ where: { id } });
+      const cacheKey = `employee:${id}`;
+
+      const cachedEmployee = await redis.get(cacheKey);
+
+      if (cachedEmployee) {
+        return JSON.parse(cachedEmployee);
+      }
+
+      const employee = await prisma.employee.findFirst({ where: { id } });
+
+      await redis.set(cacheKey, JSON.stringify(employee));
+
+      return employee;
     } catch (error: any) {
       throw new Api500Error(
         "Ocorreu um erro ao tentar buscar um funcionário.",
