@@ -1,6 +1,6 @@
-import { Api400Error } from "../../util/400-error";
-import { Api500Error } from "../../util/500-error";
-import { logger } from "../../util/logger/logger";
+import { Api400Error } from "../util/400-error";
+import { Api500Error } from "../util/500-error";
+import { logger } from "../util/logger/logger";
 
 import EmployeeRepository from "../repositories/employee-repository";
 
